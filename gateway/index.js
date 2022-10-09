@@ -4,6 +4,7 @@ const app = express();
 const {setupLogging} = require('./logging');
 const {ROUTES} = require('./routes') 
 const {setupProxies} = require('./proxy')
+const {setupAuth} = require("./auth");
 // const morgan = require('morgan')
 // const routes = require('./routes')
 
@@ -13,8 +14,10 @@ const HOST = 'localhost';
 
 app.use(express.json());
 
-setupLogging(app)
+setupLogging(app);
 setupProxies(app, ROUTES);
+setupAuth(app, ROUTES);
+
 
 // create endpoint
 // app.use('/', routes)
