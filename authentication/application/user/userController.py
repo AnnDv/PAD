@@ -38,6 +38,8 @@ class LoginController:
         response.set_cookie('x-auth-token', token)
         return response
 
+# To Do
+# Add verification if user is logged-in -> has x-auth-token
     def logOut(self):
         resp=make_response({'status':True, 'msg':'Logout Success'})
         resp.delete_cookie('x-auth-token')
@@ -47,6 +49,7 @@ class LoginController:
 class UserController:    
     def insertNewData(self):
         try:
+            print(request.json)
             parameter={
                 'usr_name':request.json.get('username'),
                 'usr_password':bcrypt.hashpw(
@@ -62,9 +65,9 @@ class UserController:
         parameter={
             'usr_name':request.json.get('username'),
             }
-        print("Ahtung")
+        # print("Ahtung")
         user=DataHandler().getUser(parameter)
-        print("Ahtung1")
+        # print("Ahtung1")
         if not user:
             raise LoginErr('User is not found')
         if  bcrypt.checkpw(

@@ -6,4 +6,4 @@ marshmallow==3.14.0
 bcrypt==3.2.0
 
 # # for linux
-# # psycopg2
+psycopg2

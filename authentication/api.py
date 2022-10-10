@@ -10,6 +10,7 @@ def login():
     return LoginController().login()
 
 @app.get('/logout')
+@auth.middleware
 def logOut():
     return LoginController().logOut()
 

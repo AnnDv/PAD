@@ -12,7 +12,7 @@ services:
   flask:
     build:
       context: .
-      dockerfile: ./authentication/Dockerfile
+      dockerfile: authentication/Dockerfile
     environment:  # or use env_file as you did above
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: "1234"
