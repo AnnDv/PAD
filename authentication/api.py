@@ -2,6 +2,7 @@ from app import app
 from flask import request
 from application.user.userController import LoginController, UserController
 from application.utilities.auth import  Auth
+from application.utilities.response import Response
 
 auth=Auth()
 
@@ -18,3 +19,13 @@ def logOut():
 @app.post('/newuser')
 def newUser():
     return UserController().insertNewData()
+
+@app.get('/verifyuser')
+@auth.middleware
+def verifyUser():
+    return UserController().verifyUser()
+
+@app.get('/verifytoken')
+@auth.middleware
+def verifyToken():
+    return Response.make(True, "Token is valid")

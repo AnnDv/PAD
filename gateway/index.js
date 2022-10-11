@@ -6,9 +6,7 @@ const {ROUTES} = require('./routes')
 const {setupProxies} = require('./proxy')
 const {setupAuth} = require("./auth");
 const request = require('sync-request');
-// const morgan = require('morgan')
-// const routes = require('./routes')
-
+const cookieParser = require('cookie-parser')
 
 const PORT = 8000;
 const HOST = 'localhost';
@@ -16,15 +14,15 @@ const HOST = 'localhost';
 const AUTHPORT = 8887;
 const AUTHHOST = 'localhost';
 
+const RECOGPORT = 5000;
+const RECOGHOST = 'localhost';
+
 app.use(express.json());
+app.use(cookieParser())
 
 setupLogging(app);
 setupProxies(app, ROUTES);
 setupAuth(app, ROUTES);
-
-
-// create endpoint
-// app.use('/', routes)
 
 app.listen(PORT, () => {
     console.log("Gateway has started on port: " + PORT)
@@ -52,6 +50,10 @@ app.post('/login', (req, res) => {
 app.get('/log-out', (req, res) =>{
     
     res.send(logoutUser(req.headers.cookie))
+})
+
+app.post('/reco', (req, res) =>{
+    res.send(recognition(req.cookies["x-auth-token"], req.body))
 })
 
 // makes request to newuser endpoint in authetication microservice
@@ -95,7 +97,6 @@ function loginUser(body){
 
 // makes request to logout endpoint in authetication microservice
 function logoutUser(auth_token){
-    console.log(auth_token)
     let clientServerOptions = {
         uri: 'http://' + AUTHHOST + ':' + AUTHPORT + '/logout',
         method: 'GET',
@@ -108,4 +109,51 @@ function logoutUser(auth_token){
         clientServerOptions.uri);
 
     return responseFromAuth.body;
+}
+
+function verifyUser(cookies){
+    console.log("AUTH cookies=" + cookies)
+    let clientServerOptions = {
+        uri: 'http://' + AUTHHOST + ':' + AUTHPORT + '/verifyuser',
+        method: 'GET'
+        // headers: {
+        //     'x-auth-token': token
+        // }
+    }
+
+    let responseFromAuth = request(clientServerOptions.method, 
+        clientServerOptions.uri, {
+            headers: {
+                "Cookie":"x-auth-token=" + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJqYWtlIiwiZXhwIjoxNjY1NTAxNTE0fQ.ICI4cabQWAJUObU8muL-z5SP2p0PB9Wpl2UXQKhI7mg"
+            }});
+    
+    let parsedJson = JSON.parse(responseFromAuth.body)
+    console.log("response   " + responseFromAuth.body)
+    console.log("response   " + parsedJson["status"])
+    return parsedJson["status"]
+}
+
+function recognition(cookies){
+    if(!verifyUser(cookies)){
+        return "Invalid user"
+    } else {
+        let clientServerOptions = {
+            uri: 'http://' + RECOGHOST + ':' + RECOGPORT + '/recognition',
+            method: 'POST',
+            headers: {
+                Cookie: cookies
+            }
+        }
+    
+        let responseFromAuth = request(clientServerOptions.method, 
+            clientServerOptions.uri, {
+                headers: {
+                    "Cookie":"x-auth-token=" + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJqYWtlIiwiZXhwIjoxNjY1NTAxNTE0fQ.ICI4cabQWAJUObU8muL-z5SP2p0PB9Wpl2UXQKhI7mg"
+
+                }
+            });
+    
+        console.log(responseFromAuth.body)
+        return responseFromAuth.body
+    }
 }

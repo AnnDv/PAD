@@ -30,12 +30,14 @@ class LoginController:
                 'exp':datetime.utcnow() + timedelta(minutes=30)
             },
             key=JWT_SECRETKEY, algorithm='HS256')
+        print(token)
         return token
     
     def setCookie(self, token):
         successLogin={'status':True, 'msg':'Login Success'}
         response=make_response(successLogin)
         response.set_cookie('x-auth-token', token)
+        print(token)
         return response
 
 # To Do
@@ -65,9 +67,7 @@ class UserController:
         parameter={
             'usr_name':request.json.get('username'),
             }
-        # print("Ahtung")
-        user=DataHandler().getUser(parameter)
-        # print("Ahtung1")
+        user = DataHandler().getUser(parameter)
         if not user:
             raise LoginErr('User is not found')
         if  bcrypt.checkpw(
@@ -77,6 +77,13 @@ class UserController:
             return user
         raise LoginErr('Permission denied, your password or username is incorrect.')
 
+    def verifyUser(self):
+        token=request.cookies.get('x-auth-token')
+        print(token)
+        userData = jwt.decode(token, JWT_SECRETKEY, algorithms='HS256')
+        
+        return Response.make(True, "Valid", userData)
+        
 class DataHandler:
     
     def getUser(self, parameter):

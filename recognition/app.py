@@ -2,7 +2,7 @@ from flask import Flask, Response, request
 
 app = Flask(__name__)
 
-@app.route('/json-example', methods=['POST'])
+@app.route('/recognition', methods=['POST'])
 def json_example():
     request_data = request.get_json()
 
