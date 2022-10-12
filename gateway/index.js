@@ -17,11 +17,17 @@ const AUTHHOST = 'localhost';
 const RECOGPORT = 5000;
 const RECOGHOST = 'localhost';
 
+const CAHCHEPORT = 3000;
+const CACHEHOST = 'localhost'
+
 app.use(express.json());
 app.use(cookieParser())
 
+// enable requests logging 
 setupLogging(app);
+// enable proxy
 setupProxies(app, ROUTES);
+// enable auth
 setupAuth(app, ROUTES);
 
 app.listen(PORT, () => {
@@ -54,6 +60,13 @@ app.get('/log-out', (req, res) =>{
 
 app.post('/reco', (req, res) =>{
     res.send(recognition(req.cookies["x-auth-token"], req.body))
+})
+
+app.post('/cache', (req, res) => {
+    
+    // createNewUser(req.body)
+    res.send(cacheUser(req.body));
+    
 })
 
 // makes request to newuser endpoint in authetication microservice
@@ -156,4 +169,23 @@ function recognition(cookies){
         console.log(responseFromAuth.body)
         return responseFromAuth.body
     }
+}
+
+function cacheUser(body){
+    // create a dict for newuser
+    let clientServerOptions = {
+        uri: 'http://' + CACHEHOST + ':' + CAHCHEPORT + '/save-phrase',
+        body: body,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    // POST request to JSON endpoint
+    let responseFromAuth = request(clientServerOptions.method, 
+        clientServerOptions.uri, {
+            'json' : clientServerOptions.body});
+
+    return responseFromAuth.body
 }

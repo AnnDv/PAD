@@ -43,7 +43,7 @@ class LoginController:
 # To Do
 # Add verification if user is logged-in -> has x-auth-token
     def logOut(self):
-        resp=make_response({'status':True, 'msg':'Logout Success'})
+        resp = make_response({'status':True, 'msg':'Logout Success'})
         resp.delete_cookie('x-auth-token')
         return resp
     
