@@ -8,8 +8,14 @@ app.use(express.json());
 let cache_arr=[];
 
 app.post('/save-phrase', (req, res) => {
+    /*
+    check if key 'user_id' and 'phrase' exists in list, and if the length of list is equal to 2
+    */
     if (Object.keys(req.body).some(key => key === 'user_id') &&
     Object.keys(req.body).some(key => key === 'phrase') && Object.keys(req.body).length===2) {
+        /*
+        append elements to an array and output the body of json
+        */
         cache_arr.push(req.body)
         console.log(req.body)
         res.send(cache_arr)
