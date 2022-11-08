@@ -14,14 +14,14 @@ const HOST = 'localhost';
 const AUTHPORT = 8887;
 const AUTHHOST = 'localhost';
 
-const RECOGPORT = 5000;
+const RECOGPORT = 5001;
 const RECOGHOST = 'localhost';
 
 const CAHCHEPORT = 3000;
 const CACHEHOST = 'localhost'
 
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
 // enable requests logging 
 setupLogging(app);
@@ -144,12 +144,13 @@ function verifyUser(cookies){
     return parsedJson["status"]
 }
 
-function recognition(cookies){
+function recognition(cookies, body){
+    console.log(body);
     if(!verifyUser(cookies)){
         return "Invalid user"
     } else {
         let clientServerOptions = {
-            uri: 'http://' + RECOGHOST + ':' + RECOGPORT + '/recognition',
+            uri: 'http://' + RECOGHOST + ':' + RECOGPORT + '/reco',
             method: 'POST',
             headers: {
                 Cookie: cookies
@@ -158,12 +159,7 @@ function recognition(cookies){
     
         let responseFromAuth = request(clientServerOptions.method, 
             clientServerOptions.uri, {
-                headers: {
-                    "Cookie": "x-auth-token"
-
-                }
-            });
-    
+                'json' : body});
         console.log(responseFromAuth.body)
         return responseFromAuth.body
     }
