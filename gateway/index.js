@@ -47,14 +47,11 @@ app.post('/newuser', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    
-    // createNewUser(req.body)
-    res.send(loginUser(req.body));
-    
+    user_header = loginUser(req.body)
+    res.setHeader('set-cookie', user_header).send();
 })
 
 app.get('/log-out', (req, res) =>{
-    
     res.send(logoutUser(req.headers.cookie))
 })
 
@@ -102,10 +99,11 @@ function loginUser(body){
 
     let responseFromAuth = request(clientServerOptions.method, 
         clientServerOptions.uri, {
-            'json' : clientServerOptions.body});
-
-    // console.log(responseFromAuth)
-    return responseFromAuth.body
+            'json' : clientServerOptions.body
+        });
+// TODO Find a way to extract token from cache response
+    console.log(responseFromAuth.headers['set-cookie'])
+    return responseFromAuth.headers['set-cookie']
 }
 
 // makes request to logout endpoint in authetication microservice
@@ -137,7 +135,7 @@ function verifyUser(cookies){
     let responseFromAuth = request(clientServerOptions.method, 
         clientServerOptions.uri, {
             headers: {
-                "Cookie":"x-auth-token=" + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJqYWtlIiwiZXhwIjoxNjY1NTAxNTE0fQ.ICI4cabQWAJUObU8muL-z5SP2p0PB9Wpl2UXQKhI7mg"
+                "Cookie": "x-auth-token="+cookies
             }});
     
     let parsedJson = JSON.parse(responseFromAuth.body)
@@ -161,7 +159,7 @@ function recognition(cookies){
         let responseFromAuth = request(clientServerOptions.method, 
             clientServerOptions.uri, {
                 headers: {
-                    "Cookie":"x-auth-token=" + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJqYWtlIiwiZXhwIjoxNjY1NTAxNTE0fQ.ICI4cabQWAJUObU8muL-z5SP2p0PB9Wpl2UXQKhI7mg"
+                    "Cookie": "x-auth-token"
 
                 }
             });
@@ -172,7 +170,7 @@ function recognition(cookies){
 }
 
 function cacheUser(body){
-    // create a dict for newuser
+    // create a dict for cache
     let clientServerOptions = {
         uri: 'http://' + CACHEHOST + ':' + CAHCHEPORT + '/save-phrase',
         body: body,
