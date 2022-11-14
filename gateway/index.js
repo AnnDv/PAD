@@ -101,9 +101,9 @@ function loginUser(body){
         clientServerOptions.uri, {
             'json' : clientServerOptions.body
         });
-// TODO Find a way to extract token from cache response
-    console.log(responseFromAuth.headers['set-cookie'])
-    return responseFromAuth.headers['set-cookie']
+
+    console.log(responseFromAuth.headers['set-cookie']);
+    return responseFromAuth.headers['set-cookie'];
 }
 
 // makes request to logout endpoint in authetication microservice
@@ -127,9 +127,6 @@ function verifyUser(cookies){
     let clientServerOptions = {
         uri: 'http://' + AUTHHOST + ':' + AUTHPORT + '/verifyuser',
         method: 'GET'
-        // headers: {
-        //     'x-auth-token': token
-        // }
     }
 
     let responseFromAuth = request(clientServerOptions.method, 
@@ -154,12 +151,15 @@ function recognition(cookies, body){
             method: 'POST',
             headers: {
                 Cookie: cookies
-            }
+            },
+            timeout: 1
         }
     
         let responseFromAuth = request(clientServerOptions.method, 
             clientServerOptions.uri, {
-                'json' : body});
+                'json' : body,
+                // 'timeout': clientServerOptions.timeout
+            });
         console.log(responseFromAuth.body)
         return responseFromAuth.body
     }
@@ -173,7 +173,7 @@ function cacheUser(body){
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
     }
 
     // POST request to JSON endpoint

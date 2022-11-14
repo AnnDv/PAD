@@ -28,10 +28,13 @@ function recognition(body) {
     let clientServerOptions = {
         uri: API_URL + `?api_key=${API_KEY}&language=en-US&query=${phrase}&page=1&include_adult=false`,
         method: 'GET',
+        timeout: 1000,
     }
 
     let responseFromAuth = request(clientServerOptions.method, 
-        clientServerOptions.uri
+        clientServerOptions.uri, {
+            "timeout": clientServerOptions.timeout
+        }
     );
 
     console.log(responseFromAuth.getBody()["results"]);
@@ -39,9 +42,8 @@ function recognition(body) {
     movies = movies_result["results"];
     title = [];
     for(movie of movies) {
-        // title = movie["original_title"];
         title.push(movie["original_title"])
     }
     
-    return {"titles": title};
+    return {"movies": title};
 }
