@@ -1,3 +1,4 @@
+
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -6,7 +7,8 @@ const {ROUTES} = require('./routes')
 const {setupProxies} = require('./proxy')
 const {setupAuth} = require("./auth");
 const request = require('sync-request');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const {circuitBreaker} = require("./circuitBreaker")
 
 const PORT = 8000;
 const HOST = 'localhost';
@@ -47,8 +49,15 @@ app.post('/newuser', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    user_header = loginUser(req.body)
-    res.setHeader('set-cookie', user_header).send();
+    result = circuitBreaker(3, loginUser, req.body);
+    console.log("ahtung " + result);
+    if(result == "404"){
+        res.send("Service is not responding")
+    }else{
+        console.log(result)
+        user_header = result.headers['set-cookie'];
+        res.setHeader('set-cookie', user_header).send();
+    }
 })
 
 app.get('/log-out', (req, res) =>{
@@ -103,7 +112,7 @@ function loginUser(body){
         });
 
     console.log(responseFromAuth.headers['set-cookie']);
-    return responseFromAuth.headers['set-cookie'];
+    return responseFromAuth;
 }
 
 // makes request to logout endpoint in authetication microservice
@@ -161,6 +170,7 @@ function recognition(cookies, body){
                 // 'timeout': clientServerOptions.timeout
             });
         console.log(responseFromAuth.body)
+        // parse cookie and extract user id and place it to the body
         return responseFromAuth.body
     }
 }
@@ -183,3 +193,4 @@ function cacheUser(body){
 
     return responseFromAuth.body
 }
+

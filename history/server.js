@@ -14,7 +14,7 @@ const app = express();
 
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/movie_history');
+mongoose.connect('mongodb://localhost:27017/movice_history');
 
 const port = 3030;
 

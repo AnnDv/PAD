@@ -9,6 +9,10 @@ const express = require('express');
 const app = express();
 
 const PORT = 5001;
+
+const HISTORYPORT = 3030
+const HISTORYHOST = 'localhost';
+
 app.use(express.json());
 
 app.listen(PORT, () => {
@@ -20,6 +24,10 @@ app.post('/reco', (req, res) => {
     // createNewUser(req.body)
     res.send(recognition(req.body));
 });
+
+app.post('/history', (req, res) => {
+    res.send(postHistoryData(req.body))
+})
 
 function recognition(body) {
     console.log(body)
@@ -46,4 +54,20 @@ function recognition(body) {
     }
     
     return {"movies": title};
+}
+
+function postHistoryData(body) {
+    let clientServerOptions = {
+        uri: 'http://' + HISTORYHOST + ':' + HISTORYPORT + '/history',
+        body: body,
+        method: 'POST',
+    }
+
+    let responseFromAuth = request(clientServerOptions.method, 
+        clientServerOptions.uri, {
+            'json' : body
+        });
+
+    console.log(responseFromAuth.body);
+    return responseFromAuth.body;
 }
