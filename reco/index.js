@@ -20,48 +20,58 @@ app.listen(PORT, () => {
 })
 
 app.post('/reco', (req, res) => {
-    
-    // createNewUser(req.body)
     res.send(recognition(req.body));
 });
 
-app.post('/history', (req, res) => {
-    res.send(postHistoryData(req.body))
-})
+// app.post('/history', (req, res) => {
+//     res.send(postHistoryData(req.body))
+// })
 
 function recognition(body) {
     console.log(body)
     let phrase = body["phrase"];
+    let userId = body["userId"];
+
+    console.log(phrase);
+    console.log(userId);
 
     let clientServerOptions = {
         uri: API_URL + `?api_key=${API_KEY}&language=en-US&query=${phrase}&page=1&include_adult=false`,
         method: 'GET',
-        timeout: 1000,
-    }
+        // timeout: 1000,
+    };
 
     let responseFromAuth = request(clientServerOptions.method, 
         clientServerOptions.uri, {
-            "timeout": clientServerOptions.timeout
+            // "timeout": clientServerOptions.timeout
         }
     );
 
-    console.log(responseFromAuth.getBody()["results"]);
+    // console.log(responseFromAuth.getBody()["results"]);
+
     movies_result = JSON.parse(responseFromAuth.getBody());
     movies = movies_result["results"];
     title = [];
     for(movie of movies) {
         title.push(movie["original_title"])
-    }
+    };
+
+    // console.log(movies);
     
-    return {"movies": title};
+    let resultFromHist = postHistoryData({"userId": userId, "movies": title});
+    
+    // console.log(responseFromAuth);
+    
+    return resultFromHist;
 }
 
 function postHistoryData(body) {
+    console.log(body)
     let clientServerOptions = {
         uri: 'http://' + HISTORYHOST + ':' + HISTORYPORT + '/history',
         body: body,
         method: 'POST',
-    }
+    };
 
     let responseFromAuth = request(clientServerOptions.method, 
         clientServerOptions.uri, {

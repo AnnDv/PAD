@@ -145,14 +145,13 @@ function verifyUser(cookies){
             }});
     
     let parsedJson = JSON.parse(responseFromAuth.body)
-    console.log("response   " + responseFromAuth.body)
-    console.log("response   " + parsedJson["status"])
-    return parsedJson["status"]
+    return parsedJson
 }
 
 function recognition(cookies, body){
-    console.log(body);
-    if(!verifyUser(cookies)){
+    // console.log(body);
+    let pJson= verifyUser(cookies)
+    if(!pJson["status"]){
         return "Invalid user"
     } else {
         let clientServerOptions = {
@@ -163,15 +162,22 @@ function recognition(cookies, body){
             },
             timeout: 1
         }
-    
-        let responseFromAuth = request(clientServerOptions.method, 
+        
+        let finalBody = pJson
+        let data = pJson["data"]
+        
+        finalBody["userId"] = data["userId"]
+        finalBody["phrase"] = body["phrase"]
+        console.log("final Body: " + finalBody["userId"])
+
+        let respFromReco = request(clientServerOptions.method, 
             clientServerOptions.uri, {
-                'json' : body,
+                'json' : finalBody,
                 // 'timeout': clientServerOptions.timeout
             });
-        console.log(responseFromAuth.body)
+        
         // parse cookie and extract user id and place it to the body
-        return responseFromAuth.body
+        return respFromReco.body
     }
 }
 
