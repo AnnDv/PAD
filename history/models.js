@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const HistorySchema = new mongoose.Schema({
-  user_id: {
-    type: Number,
+  userId: {
+    type: String,
     default: 0,
   },
   movies: {
