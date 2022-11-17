@@ -11,13 +11,25 @@ app.post('/save-phrase', (req, res) => {
     /*
     check if key 'user_id' and 'phrase' exists in list, and if the length of list is equal to 2
     */
-   console.log(req.body)
-    if (Object.keys(req.body).some(key => key === 'user_id') &&
+    if (Object.keys(req.body).some(key => key === 'userId') &&
     Object.keys(req.body).some(key => key === 'movies') && Object.keys(req.body).length===2) {
         /*
         append elements to an array and output the body of json
         */
-        cache_arr.push(req.body)
+    for (user of cache_arr){
+        if (user['userId'] == req.body['userId']){
+            for (movie of req.body['movies']){
+                if (movie in user['movies']){
+
+                }
+                else{
+                    user['movie'].push(movie)
+                }
+           }
+        }
+    }
+       
+        // cache_arr.push(req.body)
         console.log(req.body)
         res.send(cache_arr)
     } else {
