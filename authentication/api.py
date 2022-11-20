@@ -3,6 +3,7 @@ from flask import request
 from application.user.userController import LoginController, UserController
 from application.utilities.auth import  Auth
 from application.utilities.response import Response
+from app import PORT
 
 auth=Auth()
 
@@ -29,3 +30,7 @@ def verifyUser():
 @auth.middleware
 def verifyToken():
     return Response.make(True, "Token is valid")
+
+@app.get('/status')
+def getStaus():
+    return Response.status(True, PORT, ['/login', '/logout', '/newuser', '/verifyuser', '/verifytoken'])

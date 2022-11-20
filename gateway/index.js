@@ -1,4 +1,3 @@
-
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -8,7 +7,8 @@ const {setupProxies} = require('./proxy')
 const {setupAuth} = require("./auth");
 const request = require('sync-request');
 const cookieParser = require('cookie-parser');
-const {circuitBreaker} = require("./circuitBreaker")
+const {circuitBreaker} = require("./circuitBreaker");
+const CircuitBreaker = require('./Circuitbreak');
 
 const PORT = 8000;
 const HOST = 'localhost';
@@ -42,9 +42,22 @@ app.get('/', (req, res) => {
 })
 
 app.post('/newuser', (req, res) => {
+    const newUserBreaker = new CircuitBreaker(createNewUser);
+
+    function timer() {
+        newUserBreaker
+          .fire()
+          .then(console.log)
+          .catch(console.error)
+    }
+
+    const newUserInterval = setInterval(timer, 1000);
+    // setTimeout(function( ) { clearInterval( newUserInterval ); }, 5000);
+      
     
     // createNewUser(req.body)
     res.send(createNewUser(req.body));
+    
     
 })
 

@@ -5,6 +5,8 @@ import bcrypt
 
 JWT_SECRETKEY=bcrypt.hashpw(b'itsAs3cr34tkeyforJWT', bcrypt.gensalt())
 
+PORT = 8887
+
 app=Flask(__name__)
 POSTGRES={
     'user':'anadvorac',
