@@ -55,15 +55,16 @@ app.post('/history', async (req, res, next) => {
     res.status(200).send("ok")
 })
 
-app.get('/get-history/:id', (req, res) => {
+app.get('/history/:id', (req, res) => {
   let id = req.params.id
   let result = getCacheData(id)
-  console.log(result.lenght)
-  if (result.lenght == 0){
-    models.History.findById(id)
-    .then(data => response.json(data))
+  console.log(result);
+  if (result ){
+    res.json(result)
   } else {
-    response.json(result)
+    models.History.findById(id)
+    .then(data => res.json(data))
+    
   }     
 })
 
@@ -99,10 +100,10 @@ function getCacheData(id) {
   console.log(clientServerOptions.uri)
 
   let responseFromAuth = request(clientServerOptions.method, 
-      clientServerOptions.uri, {
-          'json' : ''
-      });
-
-  console.log(responseFromAuth.body);
-  return responseFromAuth.body;
+      clientServerOptions.uri);
+    let result = JSON.parse(responseFromAuth.body);
+    if(result['userId']){
+      console.log(result)
+    }
+  return result;
 }

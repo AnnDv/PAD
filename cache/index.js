@@ -42,11 +42,12 @@ app.get('/get-hist/:id', (req, res) => {
     console.log(req.params.id)
     for (user of cache_arr){
         if (user['userId'] == req.params.id){
-            res.status(200).send(user);
+            console.log(user)
+            res.status(200).json(user);
             return
         }
     }
-    res.status(400).send("Unable to find user with this Id");
+    res.status(400).json({status:"Unable to find user with this Id"});
 })
 
 app.listen(port, () => {
