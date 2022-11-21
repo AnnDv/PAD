@@ -49,15 +49,15 @@ app.post('/history', async (req, res, next) => {
         history.movies.push(elm)
       }
     }
-    let result = postCacheData({'userId': id, 'movies': moviestocache})
+    let result = postCacheData({'userId': id, 'movies': moviestocache, 'address': req.body['address']})
     history.save()
     }
     res.status(200).send("ok")
 })
 
-app.get('/history/:id', (req, res) => {
+app.get('/history/:id/:address', (req, res) => {
   let id = req.params.id
-  let result = getCacheData(id)
+  let result = getCacheData(id, req.params.address)
   console.log(result);
   if (result ){
     res.json(result)
@@ -91,9 +91,9 @@ function postCacheData(body) {
   return responseFromAuth.body;
 }
 
-function getCacheData(id) {
+function getCacheData(id, address) {
   let clientServerOptions = {
-      uri: 'http://' + CACHEHOST + ':' + CACHEPORT + '/get-hist/' + id,
+      uri: 'http://' + CACHEHOST + ':' + CACHEPORT + '/get-hist/' + id + '/' + address,
       body: '',
       method: 'GET',
   }

@@ -9,10 +9,11 @@ let cache_arr=[];
 
 app.post('/save-phrase', (req, res) => {
     /*
-    check if key 'user_id' and 'phrase' exists in list, and if the length of list is equal to 2
+    check if key 'user_id' and 'phrase' and 'address' exists in list, and if the length of list is equal to 3
     */
     if (Object.keys(req.body).some(key => key === 'userId') &&
-    Object.keys(req.body).some(key => key === 'movies') && Object.keys(req.body).length===2) {
+    Object.keys(req.body).some(key => key === 'movies') && 
+    Object.keys(req.body).some(key => key === 'address') && Object.keys(req.body).length===3) {
         /*
         append elements to an array and output the body of json
         */
@@ -29,6 +30,7 @@ app.post('/save-phrase', (req, res) => {
         }
     }
         if (isUserInCache == false){
+            console.log(req.body)
             cache_arr.push(req.body)
         }
         res.send(cache_arr)
@@ -38,9 +40,12 @@ app.post('/save-phrase', (req, res) => {
 
 })
 
-app.get('/get-hist/:id', (req, res) => {
-    console.log(req.params.id)
+app.get('/get-hist/:id/:address', (req, res) => {
+    console.log(req.socket.remoteAddress)
     for (user of cache_arr){
+        if (req.params.address !== user['address']){
+            continue
+        }
         if (user['userId'] == req.params.id){
             console.log(user)
             res.status(200).json(user);
