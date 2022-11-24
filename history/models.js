@@ -9,6 +9,10 @@ const HistorySchema = new mongoose.Schema({
     type: [String],
     required: true,
   },
+  address: {
+    type: String,
+    required: false,
+  },
 });
 
 const History = mongoose.model("History", HistorySchema);
