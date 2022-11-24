@@ -101,9 +101,13 @@ function getCacheData(id, address) {
 
   let responseFromAuth = request(clientServerOptions.method, 
       clientServerOptions.uri);
+      // console.log(responseFromAuth)
     let result = JSON.parse(responseFromAuth.body);
     if(result['userId']){
       console.log(result)
     }
+  
   return result;
 }
+
+module.exports = app;

@@ -14,8 +14,12 @@ class CircuitBreaker {
   
     async fire() {
       if (this.state === "OPEN") {
-
+      if (this.nextAttempt <= Date.now()) {
+        this.state = "HALF"
+      } else {
+        throw new Error("Breaker is OPEN")
       }
+    }
       try {
         const response = await this.request()
         return this.success(response)

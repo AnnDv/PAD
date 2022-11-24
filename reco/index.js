@@ -20,6 +20,7 @@ app.listen(PORT, () => {
 })
 
 app.post('/reco', (req, res) => {
+    // res.sendStatus(201);
     res.send(recognition(req.body));
 });
 
@@ -38,7 +39,7 @@ function recognition(body) {
     let clientServerOptions = {
         uri: API_URL + `?api_key=${API_KEY}&language=en-US&query=${phrase}&page=1&include_adult=false`,
         method: 'GET',
-        // timeout: 1000,
+        // timeout: 3000,
     };
 
     let responseFromAuth = request(clientServerOptions.method, 
@@ -81,3 +82,6 @@ function postHistoryData(body) {
     console.log(responseFromAuth.body);
     return responseFromAuth.body;
 }
+
+// module.exports = app;
+// module.exports = {postHistoryData};

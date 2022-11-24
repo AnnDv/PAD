@@ -31,6 +31,6 @@ def verifyUser():
 def verifyToken():
     return Response.make(True, "Token is valid")
 
-@app.get('/status')
-def getStaus():
-    return Response.status(True, PORT, ['/login', '/logout', '/newuser', '/verifyuser', '/verifytoken'])
+# @app.get('/status')
+# def getStaus():
+#     return Response.status(True, PORT, ['/login', '/logout', '/newuser', '/verifyuser', '/verifytoken'])

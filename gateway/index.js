@@ -42,16 +42,15 @@ app.get('/', (req, res) => {
 })
 
 app.post('/newuser', (req, res) => {
-    const newUserBreaker = new CircuitBreaker(createNewUser);
+    // const newUserBreaker = new CircuitBreaker(createNewUser);
 
-    function timer() {
-        newUserBreaker
-          .fire()
-          .then(console.log)
-          .catch(console.error)
-    }
+    // function timer() {
+    //     newUserBreaker
+    //       .fire()
+    //       .then(console.log)
+    // }
 
-    const newUserInterval = setInterval(timer, 1000);
+    // setInterval(timer, 1000);
     // setTimeout(function( ) { clearInterval( newUserInterval ); }, 5000);
       
     
@@ -62,15 +61,17 @@ app.post('/newuser', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    result = circuitBreaker(3, loginUser, req.body);
-    console.log("ahtung " + result);
-    if(result == "404"){
-        res.send("Service is not responding")
-    }else{
-        console.log(result)
-        user_header = result.headers['set-cookie'];
-        res.setHeader('set-cookie', user_header).send();
-    }
+    // result = circuitBreaker(3, loginUser, req.body);
+    // console.log("ahtung " + result);
+    // if(result == "404"){
+    //     res.send("Service is not responding")
+    // }else{
+    //     console.log(result)
+    //     user_header = result.headers['set-cookie'];
+    //     res.setHeader('set-cookie', user_header).send();
+    // }
+    user_header = loginUser(req.body)
+    res.setHeader('set-cookie', user_header).send();
 })
 
 app.get('/log-out', (req, res) =>{
