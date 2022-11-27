@@ -20,7 +20,10 @@ const RECOGPORT = 5001;
 const RECOGHOST = 'localhost';
 
 const CAHCHEPORT = 3000;
-const CACHEHOST = 'localhost'
+const CACHEHOST = 'localhost';
+
+const HISTPORT = 3030;
+const HISTHOST = 'localhost';
 
 app.use(express.json());
 app.use(cookieParser());
@@ -71,7 +74,7 @@ app.post('/login', (req, res) => {
     //     res.setHeader('set-cookie', user_header).send();
     // }
     user_header = loginUser(req.body)
-    res.setHeader('set-cookie', user_header).send();
+    res.setHeader('set-cookie', user_header.headers['set-cookie']).send();
 })
 
 app.get('/log-out', (req, res) =>{
@@ -88,6 +91,10 @@ app.post('/cache', (req, res) => {
     res.send(cacheUser(req.body));
     
 })
+
+app.get('/get-history'), (req, res) => {
+    res.send(showUserHistory(req.body))
+}
 
 // makes request to newuser endpoint in authetication microservice
 function createNewUser(body){
@@ -182,6 +189,8 @@ function recognition(cookies, body){
         
         finalBody["userId"] = data["userId"]
         finalBody["phrase"] = body["phrase"]
+        finalBody["address"] = body["address"]
+
         console.log("final Body: " + finalBody["userId"])
 
         let respFromReco = request(clientServerOptions.method, 
@@ -214,3 +223,19 @@ function cacheUser(body){
     return responseFromAuth.body
 }
 
+function showUserHistory(body){
+    let clientServerOptions = {
+        uri: 'http://' + HISTHOST + ':' + HISTPORT + '/history/:id/:address',
+        body: body,
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    let responseFromAuth = request(clientServerOptions.method, 
+        clientServerOptions.uri);
+
+    console.log(responseFromAuth.body);
+    return responseFromAuth.body;
+}

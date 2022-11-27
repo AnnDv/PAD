@@ -32,6 +32,7 @@ function recognition(body) {
     console.log(body)
     let phrase = body["phrase"];
     let userId = body["userId"];
+    let address = body["address"];
 
     console.log(phrase);
     console.log(userId);
@@ -59,7 +60,7 @@ function recognition(body) {
 
     // console.log(movies);
     
-    let resultFromHist = postHistoryData({"userId": userId, "movies": title});
+    let resultFromHist = postHistoryData({"userId": userId, "movies": title, "address": address});
     
     // console.log(responseFromAuth);
     

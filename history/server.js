@@ -36,7 +36,7 @@ app.post('/history', async (req, res, next) => {
     //     res.status(400).send("unable to save to database");
     //   });
 
-  console.log('movies;' + req.body['movies'])
+  console.log(req.body['movies'])
   let id = req.body['userId']
    let history = await History.findOne({ 'userId': id }).exec();
    let moviestocache = req.body['movies']
@@ -50,8 +50,10 @@ app.post('/history', async (req, res, next) => {
       }
     }
     let result = postCacheData({'userId': id, 'movies': moviestocache, 'address': req.body['address']})
+    // console.log("resul    ", JSON.parse(result.toString()))
     history.save()
     }
+    console.log(moviestocache)
     res.status(200).send("ok")
 })
 
@@ -69,7 +71,7 @@ app.get('/history/:id/:address', (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`App listening at http://localhost:${port}`)
+  console.log(`App listening at http://localhost:${port}`)
 })
 
 app.use(Router);
