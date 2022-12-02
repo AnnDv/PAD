@@ -20,6 +20,7 @@ app.post('/save-phrase', (req, res) => {
     let isUserInCache = false
     for (user of cache_arr){
         if (user['userId'] == req.body['userId']){
+            console.log("user exist" + req.body)
             for (movie of req.body['movies']){
                 if (!user['movies'].includes(movie)){
                     user['movies'].push(movie)
@@ -30,7 +31,7 @@ app.post('/save-phrase', (req, res) => {
         }
     }
         if (isUserInCache == false){
-            console.log(req.body)
+            console.log("save new user" + req.body)
             cache_arr.push(req.body)
         }
         res.send(cache_arr)
@@ -38,6 +39,13 @@ app.post('/save-phrase', (req, res) => {
         res.send("Invalid parameters")
     }
 
+})
+
+app.post('/save-persons', (req, res) => {
+    // console.log(cache_arr);
+    cache_arr.push(req.body);
+    console.log(cache_arr);
+    res.send(req.body)
 })
 
 app.get('/get-hist/:id/:address', (req, res) => {

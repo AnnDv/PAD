@@ -59,7 +59,7 @@ class UserController:
             DataHandler().insertNewData(parameter)
             return Response.make(True,'Data successfully added' )
         except:
-            return Response.make(False,'Insert data failed' )
+            return Response.make(False,'Insert data failed' + )
     
     def findUser(self):
         parameter={

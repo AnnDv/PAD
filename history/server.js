@@ -61,12 +61,11 @@ app.get('/history/:id/:address', (req, res) => {
   let id = req.params.id
   let result = getCacheData(id, req.params.address)
   console.log(result);
-  if (result ){
+  if (result){
     res.json(result)
   } else {
     models.History.findById(id)
     .then(data => res.json(data))
-    
   }     
 })
 

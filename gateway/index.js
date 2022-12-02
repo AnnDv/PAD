@@ -45,9 +45,9 @@ app.get('/', (req, res) => {
 })
 
 app.post('/newuser', (req, res) => {
-    // const newUserBreaker = new CircuitBreaker(createNewUser);
+    const newUserBreaker = new CircuitBreaker(createNewUser);
 
-    // function timer() {
+    // // function timer() {
     //     newUserBreaker
     //       .fire()
     //       .then(console.log)
@@ -57,7 +57,7 @@ app.post('/newuser', (req, res) => {
     // setTimeout(function( ) { clearInterval( newUserInterval ); }, 5000);
       
     
-    // createNewUser(req.body)
+    createNewUser(req.body)
     res.send(createNewUser(req.body));
     
     
@@ -74,6 +74,7 @@ app.post('/login', (req, res) => {
     //     res.setHeader('set-cookie', user_header).send();
     // }
     user_header = loginUser(req.body)
+    console.log(user_header)
     res.setHeader('set-cookie', user_header.headers['set-cookie']).send();
 })
 
@@ -92,9 +93,10 @@ app.post('/cache', (req, res) => {
     
 })
 
-app.get('/get-history'), (req, res) => {
-    res.send(showUserHistory(req.body))
-}
+app.get('/get-history', (req, res) => {
+    console.log('get historyyyy');
+    res.send(showUserHistory(req.cookies["x-auth-token"]))
+})
 
 // makes request to newuser endpoint in authetication microservice
 function createNewUser(body){
@@ -189,7 +191,6 @@ function recognition(cookies, body){
         
         finalBody["userId"] = data["userId"]
         finalBody["phrase"] = body["phrase"]
-        finalBody["address"] = body["address"]
 
         console.log("final Body: " + finalBody["userId"])
 
@@ -199,7 +200,6 @@ function recognition(cookies, body){
                 // 'timeout': clientServerOptions.timeout
             });
         
-        // parse cookie and extract user id and place it to the body
         return respFromReco.body
     }
 }
@@ -223,19 +223,28 @@ function cacheUser(body){
     return responseFromAuth.body
 }
 
-function showUserHistory(body){
-    let clientServerOptions = {
-        uri: 'http://' + HISTHOST + ':' + HISTPORT + '/history/:id/:address',
-        body: body,
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
+function showUserHistory(cookies){
+    let pJson= verifyUser(cookies);
+    console.log("verify ", pJson);
+    if(!pJson["status"]){
+        return "Invalid user"
+    } else {
+        let finalBody = pJson;
+        let data = pJson["data"];
+        
+        finalBody["userId"] = data["userId"]
+        let clientServerOptions = {
+            uri: 'http://' + RECOGHOST + ':' + RECOGPORT + '/history/' + finalBody["userId"],
+            method: 'GET',
+            headers: {
+                Cookie: cookies
+            }
         }
+        console.log("options ", clientServerOptions);
+
+        let respFromReco = request(clientServerOptions.method, 
+            clientServerOptions.uri);
+        
+        return respFromReco.body
     }
-
-    let responseFromAuth = request(clientServerOptions.method, 
-        clientServerOptions.uri);
-
-    console.log(responseFromAuth.body);
-    return responseFromAuth.body;
 }
