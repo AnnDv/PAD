@@ -5,6 +5,10 @@ const {MongoClient} = require('mongodb');
 const History = require("./models")
 const request = require('sync-request');
 const { response } = require("./routes");
+const http = require('http')
+const url = require('url')
+const client = require('prom-client')
+
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error: "));
@@ -24,6 +28,23 @@ app.use(express.json());
 
 const CACHEPORT = 3000;
 const CACHEHOST = 'localhost';
+
+// Create a Registry to register the metrics
+const register = new client.Registry();
+
+client.collectDefaultMetrics({
+  app: 'node-application-monitoring-app',
+  prefix: 'node_',
+  timeout: 10000,
+  gcDurationBuckets: [0.001, 0.01, 0.1, 1, 2, 5],
+  register
+});
+
+
+app.get('/metrics', async (req, res) => {
+  res.setHeader('Content-Type', register.contentType);
+  res.send(await register.metrics());
+});
 
 app.post('/history', async (req, res, next) => {
     // var userData = new History(req.body);
