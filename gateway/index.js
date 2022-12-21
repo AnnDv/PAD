@@ -7,8 +7,63 @@ const {setupProxies} = require('./proxy')
 const {setupAuth} = require("./auth");
 const request = require('sync-request');
 const cookieParser = require('cookie-parser');
-const {circuitBreaker} = require("./circuitBreaker");
 const CircuitBreaker = require('./Circuitbreak');
+const client = require('prom-client');
+
+const register = new client.Registry()
+
+// Add a default label which is added to all metrics
+register.setDefaultLabels({
+  app: 'example-nodejs-app'
+})
+
+client.collectDefaultMetrics({ 
+    app: 'node-application-monitoring-app',
+    prefix: 'node_',
+    timeout: 10000,
+    gcDurationBuckets: [0.001, 0.01, 0.1, 1, 2, 5],
+    register 
+})
+
+// const httpRequestDurationMicroseconds = new client.Histogram({
+//     name: 'http_request_duration_seconds',
+//     help: 'Duration of HTTP requests in microseconds',
+//     labelNames: ['method', 'route', 'code'],
+//     buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
+// })
+
+// const restResponseTimeHistogram = new client.Histogram({
+//     name: "rest_response_time_duration_seconds",
+//     help: "REST API response time in seconds",
+//     labelNames: ["method", "route", "status_code"],
+// });
+
+
+// Create a custom histogram metric
+const httpRequestTimer = new client.Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'code'],
+    buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10] // 0.1 to 10 seconds
+  });
+  
+  // Register the histogram
+register.registerMetric(httpRequestTimer);
+
+
+// Mock slow endpoint, waiting between 3 and 6 seconds to return a response
+const createDelayHandler = async (req, res) => {
+    if ((Math.floor(Math.random() * 100)) === 0) {
+      throw new Error('Internal Error')
+    }
+    // Generate number between 3-6, then delay by a factor of 1000 (miliseconds)
+    const delaySeconds = Math.floor(Math.random() * (6 - 3)) + 3
+    await new Promise(res => setTimeout(res, delaySeconds * 1000))
+    res.end('Slow url accessed!');
+};
+
+  
+  // Register the histogram
 
 const PORT = 8000;
 const HOST = 'localhost';
@@ -45,38 +100,39 @@ app.get('/', (req, res) => {
 })
 
 app.post('/newuser', (req, res) => {
-    const newUserBreaker = new CircuitBreaker(createNewUser);
+    const newUserBreaker = new CircuitBreaker(createNewUser);    
 
-    // // function timer() {
-    //     newUserBreaker
-    //       .fire()
-    //       .then(console.log)
-    // }
-
-    // setInterval(timer, 1000);
-    // setTimeout(function( ) { clearInterval( newUserInterval ); }, 5000);
-      
-    
     createNewUser(req.body)
     res.send(createNewUser(req.body));
-    
-    
 })
 
 app.post('/login', (req, res) => {
-    // result = circuitBreaker(3, loginUser, req.body);
-    // console.log("ahtung " + result);
-    // if(result == "404"){
-    //     res.send("Service is not responding")
-    // }else{
-    //     console.log(result)
-    //     user_header = result.headers['set-cookie'];
-    //     res.setHeader('set-cookie', user_header).send();
-    // }
     user_header = loginUser(req.body)
     console.log(user_header)
     res.setHeader('set-cookie', user_header.headers['set-cookie']).send();
 })
+
+// Prometheus metrics route
+app.get('/metrics', async (req, res) => {
+    // Start the HTTP request timer, saving a reference to the returned method
+    const end = httpRequestTimer.startTimer();
+    // Save reference to the path so we can record it when ending the timer
+    const route = req.route.path;
+      
+    res.setHeader('Content-Type', register.contentType);
+    res.send(await register.metrics());
+  
+    // End timer and add labels
+    end({ route, code: res.statusCode, method: req.method });
+});
+  
+  // 
+app.get('/slow', async (req, res) => {
+    const end = httpRequestTimer.startTimer();
+    const route = req.route.path;
+    await createDelayHandler(req, res);
+    end({ route, code: res.statusCode, method: req.method });
+});
 
 app.get('/log-out', (req, res) =>{
     res.send(logoutUser(req.headers.cookie))
