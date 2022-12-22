@@ -52,3 +52,23 @@ services:
       - 3030
     networks:
       - monitoring
+
+  reco:
+    build:
+      context: reco
+    ports:
+      - 5001:5001
+    expose:
+      - 5001
+    networks:
+      - monitoring
+
+  cache:
+    build:
+      context: cache
+    ports:
+      - 3001:3001
+    expose:
+      - 3001
+    networks:
+      - monitoring

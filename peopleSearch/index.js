@@ -11,7 +11,7 @@ const app = express();
 
 const PORT = 6001;
 
-const CACHEPORT = 3000;
+const CACHEPORT = 3001;
 const CACHEHOST = 'localhost';
 
 app.use(express.json());

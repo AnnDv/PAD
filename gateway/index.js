@@ -25,19 +25,6 @@ client.collectDefaultMetrics({
     register 
 })
 
-// const httpRequestDurationMicroseconds = new client.Histogram({
-//     name: 'http_request_duration_seconds',
-//     help: 'Duration of HTTP requests in microseconds',
-//     labelNames: ['method', 'route', 'code'],
-//     buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
-// })
-
-// const restResponseTimeHistogram = new client.Histogram({
-//     name: "rest_response_time_duration_seconds",
-//     help: "REST API response time in seconds",
-//     labelNames: ["method", "route", "status_code"],
-// });
-
 
 // Create a custom histogram metric
 const httpRequestTimer = new client.Histogram({
@@ -62,9 +49,6 @@ const createDelayHandler = async (req, res) => {
     res.end('Slow url accessed!');
 };
 
-  
-  // Register the histogram
-
 const PORT = 8000;
 const HOST = 'localhost';
 
@@ -74,7 +58,7 @@ const AUTHHOST = 'localhost';
 const RECOGPORT = 5001;
 const RECOGHOST = 'localhost';
 
-const CAHCHEPORT = 3000;
+const CAHCHEPORT = 3001;
 const CACHEHOST = 'localhost';
 
 const HISTPORT = 3030;

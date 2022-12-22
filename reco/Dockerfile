@@ -1,9 +1,9 @@
 FROM node:14-alpine
-WORKDIR /cache
+WORKDIR /reco
 COPY ["package.json", "package-lock.json", "./"]
 RUN npm install 
 COPY . .
-EXPOSE 3001
-RUN chown -R node /cache
+EXPOSE 5001
+RUN chown -R node /reco
 USER node
 CMD ["npm", "start"]
