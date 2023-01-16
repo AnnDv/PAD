@@ -2,6 +2,8 @@ version: '2.1'
 networks:
   monitoring:
     driver: bridge
+  mongo:
+    name: mongo
 volumes:
     prometheus_data: {}
     grafana_data: {}
@@ -51,10 +53,18 @@ services:
     expose:
       - 3030
     networks:
+      - mongo
       - monitoring
 
   mongo:
+    restart: always
     container_name: mongo
     image: mongo
+    expose:
+      - 27017
+    volumes:
+      - ./mongo_data:/data/db
     ports:
       - '27017:27017'
+    networks:
+      - mongo
