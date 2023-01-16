@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "cross-env NODE_ENV=test jest --testTimeout=10000"
   },
   "author": "",

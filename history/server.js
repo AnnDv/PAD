@@ -5,28 +5,13 @@ const {MongoClient} = require('mongodb');
 const History = require("./models")
 const request = require('sync-request');
 const { response } = require("./routes");
-const http = require('http')
-const url = require('url')
-const client = require('prom-client')
+const client = require('prom-client');
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", function () {
   console.log("Connected successfully");
 });
-
-const app = express();
-
-app.use(express.json());
-
-mongoose.connect('mongodb://mongo:27017/movie_history');
-
-const port = 3030;
-
-app.use(express.json());
-
-const CACHEPORT = 3001;
-const CACHEHOST = 'localhost';
 
 // Create a Registry to register the metrics
 const register = new client.Registry();
@@ -43,8 +28,6 @@ client.collectDefaultMetrics({
     gcDurationBuckets: [0.001, 0.01, 0.1, 1, 2, 5],
     register 
 })
-
-
 // Create a custom histogram metric
 const httpRequestTimer = new client.Histogram({
     name: 'http_request_duration_seconds',
@@ -56,37 +39,54 @@ const httpRequestTimer = new client.Histogram({
   // Register the histogram
 register.registerMetric(httpRequestTimer);
 
+// Mock slow endpoint, waiting between 3 and 6 seconds to return a response
 const createDelayHandler = async (req, res) => {
-  if ((Math.floor(Math.random() * 100)) === 0) {
-    throw new Error('Internal Error')
-  }
-  // Generate number between 3-6, then delay by a factor of 1000 (miliseconds)
-  const delaySeconds = Math.floor(Math.random() * (6 - 3)) + 3
-  await new Promise(res => setTimeout(res, delaySeconds * 1000))
-  res.end('Slow url accessed!');
+    if ((Math.floor(Math.random() * 100)) === 0) {
+      throw new Error('Internal Error')
+    }
+    // Generate number between 3-6, then delay by a factor of 1000 (miliseconds)
+    const delaySeconds = Math.floor(Math.random() * (6 - 3)) + 3
+    await new Promise(res => setTimeout(res, delaySeconds * 1000))
+    res.end('Slow url accessed!');
 };
 
+const app = express();
+
+app.use(express.json());
+
+mongoose.connect('mongodb://mongo:27017/movie_history');
+
+const port = 3030;
+
+app.use(express.json());
+
+const CACHEPORT = 3001;
+const CACHEHOST = 'localhost';
+
+app.listen(port, () => {
+  console.log(`App listening at http://localhost:${port}`)
+})
 
 // Prometheus metrics route
 app.get('/metrics', async (req, res) => {
-  // Start the HTTP request timer, saving a reference to the returned method
-  const end = httpRequestTimer.startTimer();
-  // Save reference to the path so we can record it when ending the timer
-  const route = req.route.path;
-    
-  res.setHeader('Content-Type', register.contentType);
-  res.send(await register.metrics());
-
-  // End timer and add labels
-  end({ route, code: res.statusCode, method: req.method });
+    // Start the HTTP request timer, saving a reference to the returned method
+    const end = httpRequestTimer.startTimer();
+    // Save reference to the path so we can record it when ending the timer
+    const route = req.route.path;
+      
+    res.setHeader('Content-Type', register.contentType);
+    res.send(await register.metrics());
+  
+    // End timer and add labels
+    end({ route, code: res.statusCode, method: req.method });
 });
-
-// 
+  
+  // 
 app.get('/slow', async (req, res) => {
-  const end = httpRequestTimer.startTimer();
-  const route = req.route.path;
-  await createDelayHandler(req, res);
-  end({ route, code: res.statusCode, method: req.method });
+    const end = httpRequestTimer.startTimer();
+    const route = req.route.path;
+    await createDelayHandler(req, res);
+    end({ route, code: res.statusCode, method: req.method });
 });
 
 app.post('/history', async (req, res, next) => {
@@ -131,10 +131,6 @@ app.get('/history/:id/:address', (req, res) => {
     models.History.findById(id)
     .then(data => res.json(data))
   }     
-})
-
-app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`)
 })
 
 app.use(Router);

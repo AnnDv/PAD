@@ -44,6 +44,24 @@ services:
       - 8000
     networks:
       - monitoring
+  cache:
+    build:
+      context: cache
+    ports:
+      - 3001:3001
+    expose:
+      - 3001
+    networks:
+      - monitoring
+  reco:
+    build:
+      context: reco
+    ports:
+      - 5001:5001
+    expose:
+      - 5001
+    networks:
+      - monitoring
       
   history:
     build:
@@ -57,7 +75,6 @@ services:
       - monitoring
 
   mongo:
-    restart: always
     container_name: mongo
     image: mongo
     expose:
@@ -68,3 +85,22 @@ services:
       - '27017:27017'
     networks:
       - mongo
+
+  # authentication:
+  #   build: ./authentication/
+  #   depends_on:
+  #     - db
+  # # db:
+  # #   build: ./authentication/database/
+  # db:
+  #   image: postgres:13.4-alpine
+  #   environment:
+  #     POSTGRES_PASSWORD: 
+  #     POSTGRES_HOST_AUTH_METHOD: trust
+  #   env_file:
+  #     - ./authentication/.env/
+
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
