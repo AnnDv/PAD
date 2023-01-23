@@ -86,10 +86,36 @@ services:
     networks:
       - mongo
 
-  # authentication:
-  #   build: ./authentication/
+  authentication:
+    container_name: authentication
+    build: ./authentication
+    ports:
+      - 8887:8887
+    expose:
+      - 8887
+    env_file:
+      - ./authentication/.env
+    # volumes:
+    #   - ./authentication/app:/app
+    
   #   depends_on:
   #     - db
+    # environment:  # or use env_file as you did above
+    #   POSTGRES_USER: postgres
+    #   POSTGRES_PASSWORD: "1234"
+    #   POSTGRES_HOST: local-postgres     # This is the name of the database service in this file above
+    #   POSTGRES_PORT: 5432
+    #   POSTGRES_DB: user_db
+
+  database:
+    container_name: loc-postgres
+    image: postgres:latest
+    # env_file: database.conf
+    ports:
+      - 5432:5432
+    
+    # depends_on:
+    #   - db
   # # db:
   # #   build: ./authentication/database/
   # db:

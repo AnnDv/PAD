@@ -53,7 +53,7 @@ const PORT = 8000;
 const HOST = 'localhost';
 
 const AUTHPORT = 8887;
-const AUTHHOST = 'localhost';
+const AUTHHOST = 'authentication';
 
 const RECOGPORT = 5001;
 const RECOGHOST = 'localhost';
@@ -85,9 +85,11 @@ app.get('/', (req, res) => {
 
 app.post('/newuser', (req, res) => {
     const newUserBreaker = new CircuitBreaker(createNewUser);    
-
+    console.log("authauthauthauyh")
     createNewUser(req.body)
+    console.log("authauthauthauyh")
     res.send(createNewUser(req.body));
+    console.log("authauthauthauyh")
 })
 
 app.post('/login', (req, res) => {
@@ -151,6 +153,8 @@ function createNewUser(body){
     }
 
     // POST request to JSON endpoint
+    console.log(clientServerOptions.uri)
+    console.log(clientServerOptions.body)
     let responseFromAuth = request(clientServerOptions.method, 
         clientServerOptions.uri, {
             'json' : clientServerOptions.body});
