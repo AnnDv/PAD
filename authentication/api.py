@@ -19,6 +19,7 @@ def logOut():
 
 @app.post('/newuser')
 def newUser():
+    print("FAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     return UserController().insertNewData()
 
 @app.get('/verifyuser')
@@ -33,4 +34,5 @@ def verifyToken():
 
 @app.get('/status')
 def getStaus():
+    print("AHTUNG")
     return Response.status(True, PORT, ['/login', '/logout', '/newuser', '/verifyuser', '/verifytoken'])
