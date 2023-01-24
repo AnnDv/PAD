@@ -4,9 +4,12 @@ networks:
     driver: bridge
   mongo:
     name: mongo
+  database:
+    name: database
 volumes:
     prometheus_data: {}
     grafana_data: {}
+    postgres-db: {}
 services:
   prometheus:
     image: prom/prometheus:latest
@@ -62,6 +65,7 @@ services:
       - 5001
     networks:
       - monitoring
+      - database
       
   history:
     build:
@@ -95,6 +99,8 @@ services:
       - 8887
     env_file:
       - ./authentication/.env
+    networks:
+      - monitoring
     # volumes:
     #   - ./authentication/app:/app
     
@@ -107,26 +113,29 @@ services:
     #   POSTGRES_PORT: 5432
     #   POSTGRES_DB: user_db
 
-  database:
-    container_name: loc-postgres
-    image: postgres:latest
-    # env_file: database.conf
-    ports:
-      - 5432:5432
+  # database:
+  #   container_name: loc-postgres
+  #   image: postgres:latest
+  #   # env_file: database.conf
+  #   ports:
+  #     - 5432:5432
     
     # depends_on:
     #   - db
   # # db:
   # #   build: ./authentication/database/
-  # db:
-  #   image: postgres:13.4-alpine
-  #   environment:
-  #     POSTGRES_PASSWORD: 
-  #     POSTGRES_HOST_AUTH_METHOD: trust
-  #   env_file:
-  #     - ./authentication/.env/
+  db:
+    image: postgres:13.4-alpine
+    environment:
+      POSTGRES_USER: anadvorac
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_HOST: localhost     # This is the name of the database service in this file above
+      POSTGRES_DB: user_db
+      POSTGRES_PORT: 5432
+    env_file:
+      - ./authentication/.env/
 
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    # volumes:
+    #   -  postgres-db:/data/postgres

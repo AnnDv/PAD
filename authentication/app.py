@@ -10,7 +10,7 @@ PORT = 8887
 app=Flask(__name__)
 POSTGRES={
     'user':'anadvorac',
-    'pw':'',
+    'pw':'1234',
     'db':'user_db',
     'host':'localhost',
     'port':'5432'
