@@ -14,11 +14,11 @@ const register = new client.Registry()
 
 // Add a default label which is added to all metrics
 register.setDefaultLabels({
-  app: 'example-nodejs-app'
+  app: 'gateway'
 })
 
 client.collectDefaultMetrics({ 
-    app: 'node-application-monitoring-app',
+    app: 'gateway',
     prefix: 'node_',
     timeout: 10000,
     gcDurationBuckets: [0.001, 0.01, 0.1, 1, 2, 5],
@@ -48,6 +48,8 @@ const createDelayHandler = async (req, res) => {
     await new Promise(res => setTimeout(res, delaySeconds * 1000))
     res.end('Slow url accessed!');
 };
+
+
 
 const PORT = 8000;
 const HOST = 'localhost';

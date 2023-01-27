@@ -58,8 +58,8 @@ class UserController:
             }
             DataHandler().insertNewData(parameter)
             return Response.make(True,'Data successfully added' )
-        except:
-            return Response.make(False,'Insert data failed')
+        except Exception as inst:
+            return Response.make(False,'Insert data failed' + inst)
     
     def findUser(self):
         parameter={

@@ -18,8 +18,12 @@ POSTGRES={
 
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s'%POSTGRES
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
-db= SQLAlchemy(app)
-migrate=Migrate(app,db)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8887)
+    try:
+        db= SQLAlchemy(app)
+        migrate=Migrate(app,db)
+    except Exception as inst:
+        print(inst)

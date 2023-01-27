@@ -101,6 +101,8 @@ services:
       - ./authentication/.env
     networks:
       - monitoring
+    depends_on:
+      - db
     # volumes:
     #   - ./authentication/app:/app
     
@@ -137,5 +139,8 @@ services:
 
     ports:
       - "5432:5432"
-    # volumes:
-    #   -  postgres-db:/data/postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+          # copy the sql script to fill tables
+      # - ./sql/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
