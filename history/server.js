@@ -18,7 +18,7 @@ const register = new client.Registry();
 
 // Add a default label which is added to all metrics
 register.setDefaultLabels({
-  app: 'example-nodejs-app'
+  app: 'history'
 })
 
 client.collectDefaultMetrics({ 
