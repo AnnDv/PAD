@@ -9,6 +9,7 @@ auth=Auth()
 
 @app.post('/login')
 def login():
+    print("FAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     return LoginController().login()
 
 @app.get('/logout')

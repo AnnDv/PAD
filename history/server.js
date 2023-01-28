@@ -61,7 +61,7 @@ const port = 3030;
 app.use(express.json());
 
 const CACHEPORT = 3001;
-const CACHEHOST = 'localhost';
+const CACHEHOST = 'cache';
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`)
@@ -122,6 +122,8 @@ app.post('/history', async (req, res, next) => {
 })
 
 app.get('/history/:id/:address', (req, res) => {
+  console.log(req.params.id)
+  console.log(req.params.address)
   let id = req.params.id
   let result = getCacheData(id, req.params.address)
   console.log(result);

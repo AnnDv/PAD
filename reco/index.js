@@ -50,7 +50,7 @@ const app = express();
 const PORT = 5001;
 
 const HISTORYPORT = 3030
-const HISTORYHOST = 'localhost';
+const HISTORYHOST = 'history';
 
 app.use(express.json());
 

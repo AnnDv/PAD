@@ -5,7 +5,8 @@ import bcrypt
 from app import db,JWT_SECRETKEY
 from application.utilities.response import Response
 from .userModel import User
-
+# from .userModel import User
+user_arr = []
 class LoginController:
     def login(self):
         user=None
@@ -25,8 +26,8 @@ class LoginController:
     def createToken(self, user):
         token=jwt.encode(
             payload={
-                'userId':user.usr_id,
-                'userId':user.usr_name,
+                'userId':user['usr_id'],
+                'userName':user['usr_name'],
                 'exp':datetime.utcnow() + timedelta(minutes=30)
             },
             key=JWT_SECRETKEY, algorithm='HS256')
@@ -48,32 +49,50 @@ class LoginController:
 
 class UserController:    
     def insertNewData(self):
+        print("erererererererer")
         try:
             print(request.json)
-            parameter={
-                'usr_name':request.json.get('username'),
+            # parameter={
+            #     'usr_name':request.json.get('username'),
+            #     'usr_password':bcrypt.hashpw(
+            #         request.json.get('password').encode('utf-8'), 
+            #         bcrypt.gensalt()).decode('utf-8')
+            # }
+            # DataHandler().insertNewData(parameter)
+            user = {
+                "usr_id": len(user_arr) + 1,
+                "usr_name": request.json.get('username'), 
                 'usr_password':bcrypt.hashpw(
                     request.json.get('password').encode('utf-8'), 
                     bcrypt.gensalt()).decode('utf-8')
-            }
-            DataHandler().insertNewData(parameter)
-            return Response.make(True,'Data successfully added' )
+                    }
+            user_arr.append(user)
+            print(user_arr)
+            return Response.make(True, user_arr)
         except Exception as inst:
-            return Response.make(False,'Insert data failed' + inst)
+            return Response.make(False,str(inst))
     
     def findUser(self):
-        parameter={
-            'usr_name':request.json.get('username'),
-            }
-        user = DataHandler().getUser(parameter)
-        if not user:
-            raise LoginErr('User is not found')
-        if  bcrypt.checkpw(
-            request.json.get('password').encode('utf-8'),
-            user.usr_password.encode('utf-8')
-            ):
-            return user
-        raise LoginErr('Permission denied, your password or username is incorrect.')
+        # parameter={
+        #     'usr_name':request.json.get('username'),
+        #     }
+        
+        # user = DataHandler().getUser(parameter)
+        for item in user_arr:
+            if item["usr_name"] == request.json.get('username'):
+                if  bcrypt.checkpw(
+                    request.json.get('password').encode('utf-8'),
+                    item['usr_password'].encode('utf-8')
+                ):return item
+            else:
+                raise LoginErr('Permission denied, your password or username is incorrect.')
+
+        raise LoginErr('User is not found')
+        # if  bcrypt.checkpw(
+        #     request.json.get('password').encode('utf-8'),
+        #     user.usr_password.encode('utf-8')
+        #     ):
+        #     return user
 
     def verifyUser(self):
         token=request.cookies.get('x-auth-token')

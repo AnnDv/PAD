@@ -58,13 +58,13 @@ const AUTHPORT = 8887;
 const AUTHHOST = 'authentication'; 
 
 const RECOGPORT = 5001;
-const RECOGHOST = 'localhost';
+const RECOGHOST = 'reco';
 
 const CAHCHEPORT = 3001;
-const CACHEHOST = 'localhost';
+const CACHEHOST = 'cache';
 
 const HISTPORT = 3030;
-const HISTHOST = 'localhost';
+const HISTHOST = 'history';
 
 app.use(express.json());
 app.use(cookieParser());
