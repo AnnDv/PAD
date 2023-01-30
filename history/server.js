@@ -90,16 +90,6 @@ app.get('/slow', async (req, res) => {
 });
 
 app.post('/history', async (req, res, next) => {
-    // var userData = new History(req.body);
-    // userData.save()
-    //   .then(item => {
-    //     console.log(req.body['user'])
-    //     res.send("item saved to database");
-    //   })
-    //   .catch(err => {
-    //     res.status(400).send("unable to save to database");
-    //   });
-
   console.log(req.body['movies'])
   let id = req.body['userId']
    let history = await History.findOne({ 'userId': id }).exec();

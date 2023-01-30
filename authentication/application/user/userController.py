@@ -5,7 +5,7 @@ import bcrypt
 from app import db,JWT_SECRETKEY
 from application.utilities.response import Response
 from .userModel import User
-# from .userModel import User
+
 user_arr = []
 class LoginController:
     def login(self):
@@ -52,13 +52,6 @@ class UserController:
         print("erererererererer")
         try:
             print(request.json)
-            # parameter={
-            #     'usr_name':request.json.get('username'),
-            #     'usr_password':bcrypt.hashpw(
-            #         request.json.get('password').encode('utf-8'), 
-            #         bcrypt.gensalt()).decode('utf-8')
-            # }
-            # DataHandler().insertNewData(parameter)
             user = {
                 "usr_id": len(user_arr) + 1,
                 "usr_name": request.json.get('username'), 
@@ -67,17 +60,11 @@ class UserController:
                     bcrypt.gensalt()).decode('utf-8')
                     }
             user_arr.append(user)
-            print(user_arr)
-            return Response.make(True, user_arr)
+            return Response.make(True, "User was added successfully!")
         except Exception as inst:
             return Response.make(False,str(inst))
     
     def findUser(self):
-        # parameter={
-        #     'usr_name':request.json.get('username'),
-        #     }
-        
-        # user = DataHandler().getUser(parameter)
         for item in user_arr:
             if item["usr_name"] == request.json.get('username'):
                 if  bcrypt.checkpw(
@@ -88,11 +75,6 @@ class UserController:
                 raise LoginErr('Permission denied, your password or username is incorrect.')
 
         raise LoginErr('User is not found')
-        # if  bcrypt.checkpw(
-        #     request.json.get('password').encode('utf-8'),
-        #     user.usr_password.encode('utf-8')
-        #     ):
-        #     return user
 
     def verifyUser(self):
         token=request.cookies.get('x-auth-token')

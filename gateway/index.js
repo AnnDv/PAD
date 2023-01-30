@@ -81,7 +81,6 @@ app.listen(PORT, () => {
 })
 
 app.get('/', (req, res) => {
-    console.log('hello')
     res.send("Simple API Gateway") 
 })
 
